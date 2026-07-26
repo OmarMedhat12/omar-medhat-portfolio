@@ -1,0 +1,6 @@
+/* Fallback only — primary site is public/design.html */
+html,
+body {
+  margin: 0;
+  background: #0e0d0c;
+}
