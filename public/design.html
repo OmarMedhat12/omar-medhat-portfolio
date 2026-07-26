@@ -357,7 +357,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .about__body p b{color:var(--text);font-weight:500}
 .about__body p:last-child{margin-bottom:0}
 .about__side{display:flex;flex-direction:column;gap:2.2rem;position:sticky;top:6rem}
-.monogram{width:96px;height:96px}
 .about__meta h4{font-family:var(--ff-mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:1rem}
 .chips{display:flex;flex-wrap:wrap;gap:.5rem}
 .chip{font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.04em;color:var(--muted);border:1px solid var(--line);padding:.45em .8em;border-radius:4px}
@@ -681,12 +680,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         <p data-reveal>I like the hard, unglamorous parts: auto-layout that self-sizes, CTAs that swap declaratively, forms that don't hide behind the footer, handoffs a client can actually maintain. Currently taking on <b>select design-systems and front-end work</b> where precision under constraint matters more than volume.</p>
       </div>
       <aside class="about__side">
-        <svg class="monogram" viewBox="0 0 96 96" role="img" aria-label="Omar monogram">
-          <rect x="1" y="1" width="94" height="94" rx="10" fill="none" stroke="var(--line)"/>
-          <circle cx="48" cy="48" r="26" fill="none" stroke="var(--text)" stroke-width="2"/>
-          <line x1="48" y1="8" x2="48" y2="88" stroke="var(--rhb)" stroke-width="1" stroke-dasharray="2 5" opacity="0.6"/>
-          <path d="M40 38v20M40 38h10a6 6 0 0 1 0 12H40m10 0 7 8" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
         <div class="about__meta">
           <h4>Toolkit</h4>
           <div class="chips">
@@ -1233,10 +1226,11 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 })();
 
 /* ============================================================
-   CONTACT FORM — validation + success state (no backend)
+   CONTACT FORM — sends to your Gmail via FormSubmit
    ============================================================ */
 (function(){
   const form=document.getElementById("form");
+  const submitBtn=form.querySelector(".form__submit");
   const fields={
     name:{el:document.getElementById("name"),wrap:document.getElementById("f-name"),test:v=>v.trim().length>=2,msg:"Please enter your name."},
     email:{el:document.getElementById("email"),wrap:document.getElementById("f-email"),test:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),msg:"Please enter a valid email."},
@@ -1249,13 +1243,38 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
     return ok;
   }
   Object.values(fields).forEach(f=>f.el.addEventListener("input",()=>{if(f.wrap.classList.contains("invalid"))check(f);}));
-  form.addEventListener("submit",e=>{
+  form.addEventListener("submit",async e=>{
     e.preventDefault();
     let valid=true;
     Object.values(fields).forEach(f=>{if(!check(f))valid=false;});
     if(!valid){form.querySelector(".invalid input,.invalid textarea")?.focus();return;}
-    form.classList.add("is-sent");
-    form.querySelector(".form__submit").textContent="Sent ✓";
+
+    const prevLabel=submitBtn.textContent;
+    submitBtn.disabled=true;
+    submitBtn.textContent="Sending…";
+
+    try{
+      const res=await fetch("https://formsubmit.co/ajax/omarmedhat0812@gmail.com",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Accept":"application/json"},
+        body:JSON.stringify({
+          name:fields.name.el.value.trim(),
+          email:fields.email.el.value.trim(),
+          message:fields.message.el.value.trim(),
+          _subject:"Portfolio contact — Omar Medhat",
+          _template:"table",
+          _captcha:"false"
+        })
+      });
+      if(!res.ok) throw new Error("send failed");
+      form.classList.add("is-sent");
+      submitBtn.textContent="Sent ✓";
+      form.reset();
+    }catch(err){
+      submitBtn.disabled=false;
+      submitBtn.textContent=prevLabel;
+      alert("Couldn't send right now. Email me directly at omarmedhat0812@gmail.com");
+    }
   });
 })();
 </script>
