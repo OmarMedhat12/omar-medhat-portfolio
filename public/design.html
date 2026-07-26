@@ -38,8 +38,6 @@
   /* project accents */
   --rhb:#d8474c;          /* RHB red, lifted for dark legibility */
   --rhb-green:#8a9a78;    /* Bab Alsalam */
-  --rhb-purple:#a49df6;   /* Bahi */
-  --rhb-sand:#c9a882;     /* Musafer */
   --ds:#6faec0;           /* Dar Senosi antique blue, lifted */
   --ds-gold:#e8aa57;      /* Dar Senosi gold */
 
@@ -76,7 +74,11 @@ body{
 }
 body.no-scroll{
   overflow:hidden;
-  touch-action:none;
+}
+html.modal-open,
+html.modal-open body{
+  overflow:hidden;
+  overscroll-behavior:none;
 }
 
 ::selection{background:var(--accent);color:#0b0a09}
@@ -270,14 +272,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .hero__index .k{font-family:var(--ff-mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
 .hero__index .v{font-size:.95rem;color:var(--text)}
 .hero__index .v .ar{font-family:var(--ff-ar);color:var(--muted);margin-left:.4rem}
-.hero__scroll{
-  position:absolute;bottom:1.6rem;left:50%;transform:translateX(-50%);z-index:2;
-  font-family:var(--ff-mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);
-  display:flex;flex-direction:column;align-items:center;gap:.5rem;
-}
-.hero__scroll .rail{width:1px;height:34px;background:linear-gradient(var(--faint),transparent);position:relative;overflow:hidden}
-.hero__scroll .rail::after{content:"";position:absolute;top:0;left:0;width:100%;height:40%;background:var(--text);animation:railDrop 1.8s var(--ease) infinite}
-@keyframes railDrop{0%{transform:translateY(-100%)}60%,100%{transform:translateY(260%)}}
 
 @keyframes heroUp{to{transform:translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
@@ -404,18 +398,22 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .modal__sheet{
   position:absolute;top:0;right:0;height:100%;width:min(920px,100%);
   background:var(--bg-2);border-left:1px solid var(--line);
-  overflow-y:auto;overscroll-behavior:contain;
+  overflow-y:auto;overflow-x:hidden;
+  overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;
-  transform:translateX(100%);transition:transform .6s var(--ease);
+  touch-action:pan-y;
+  transform:translateX(100%);transition:transform .55s var(--ease);
+  will-change:transform;
 }
-.modal.is-open .modal__sheet{transform:translateX(0)}
+.modal.is-open .modal__sheet{transform:translateX(0);will-change:auto}
 .modal__sheet::-webkit-scrollbar{width:10px}
 .modal__sheet::-webkit-scrollbar-thumb{background:var(--panel-2);border-radius:10px}
 
 .modal__bar{
   position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;
   gap:1rem;padding:1.1rem clamp(1.4rem,4vw,3rem);
-  background:rgba(20,17,16,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+  background:rgba(20,17,16,.92);
+  border-bottom:1px solid var(--line);
 }
 .modal__bar .t{display:flex;flex-direction:column;gap:.15rem;min-width:0}
 .modal__bar .t .k{font-family:var(--ff-mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mb-accent,var(--accent))}
@@ -475,15 +473,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .shot{margin:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
 .shot img{width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top;display:block}
 .shot figcaption{padding:.65rem .8rem;font-family:var(--ff-mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line)}
-.shot--scroll{grid-column:1/-1}
-.shot-scroll{
-  max-height:min(70vh,640px);
-  overflow-y:auto;
-  overscroll-behavior:contain;
-  background:#0a0908;
-  -webkit-overflow-scrolling:touch;
-}
-.shot-scroll img{width:100%;height:auto;aspect-ratio:auto;object-fit:contain;object-position:top;display:block}
+.shot--full{grid-column:1/-1}
+.shot--full img{aspect-ratio:auto;height:auto;object-fit:contain;background:#0a0908}
 @media (max-width:560px){.shot-grid{grid-template-columns:1fr}}
 
 .cs__nav{display:flex;justify-content:space-between;gap:1rem;border-top:1px solid var(--line);margin-top:3rem;padding-top:1.6rem}
@@ -585,13 +576,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   </div>
 
   <div class="hero__index">
-    <div class="col"><span class="k">Selected work</span><span class="v">02 projects</span></div>
     <div class="col"><span class="k">Disciplines</span><span class="v">Design systems &middot; Front-end</span></div>
     <div class="col"><span class="k">Based</span><span class="v">Cairo, Egypt</span></div>
     <div class="col"><span class="k">Status</span><span class="v">Open to select work</span></div>
   </div>
-
-  <div class="hero__scroll" aria-hidden="true"><span>Scroll</span><span class="rail"></span></div>
 </section>
 
 <!-- ===================== WORK ===================== -->
@@ -616,7 +604,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         <div class="card__body">
           <span class="card__kicker">Freelance <span class="yr">/ 2026</span> &middot; Saudi Arabia</span>
           <h3 class="card__title">RHB Hospitality</h3>
-          <p class="card__hook">A ground-up redesign of a Saudi serviced-apartment platform — one parent brand and three distinct sub-brands, unified in a single Figma design system and rolled out with plugin scripting across 100+ frames.</p>
+          <p class="card__hook">A ground-up redesign of a Saudi serviced-apartment platform — parent brand and Bab Alsalam sub-brand, unified in a single Figma design system and rolled out with plugin scripting across 100+ frames.</p>
           <div class="card__tags"><span class="tag">Figma</span><span class="tag">Design Systems</span><span class="tag">Multi-brand</span><span class="tag">Scripting</span></div>
           <span class="card__cta">Read the case study
             <svg width="20" height="10" viewBox="0 0 20 10" fill="none"><path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" stroke-width="1.4"/></svg>
@@ -658,7 +646,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <div class="about">
       <div class="about__body">
         <p data-reveal>I'm <b>Omar Medhat</b>, a designer-engineer based in Cairo working across UI/UX and front-end. I care about interfaces at the system level — component libraries, tokens, and the underlying data model — not just the surface of a single screen.</p>
-        <p data-reveal>My approach is <b>systems over screens</b>. On RHB that meant one shared component library driving a parent brand and three sub-brands, and Figma plugin scripts that swept sitewide fixes in a single operation instead of eighty by hand. On Dar Senosi it meant a metafield-driven data contract that gave one Shopify store three different purchase flows without a custom app. Both come from the same instinct — find the underlying model, then let it drive everything downstream.</p>
+        <p data-reveal>My approach is <b>systems over screens</b>. On RHB that meant one shared component library driving the parent brand and Bab Alsalam, and Figma plugin scripts that swept sitewide fixes in a single operation instead of eighty by hand. On Dar Senosi it meant a metafield-driven data contract that gave one Shopify store three different purchase flows without a custom app. Both come from the same instinct — find the underlying model, then let it drive everything downstream.</p>
         <p data-reveal>I like the hard, unglamorous parts: auto-layout that self-sizes, CTAs that swap declaratively, forms that don't hide behind the footer, handoffs a client can actually maintain. Currently taking on <b>select design-systems and front-end work</b> where precision under constraint matters more than volume.</p>
       </div>
       <aside class="about__side">
@@ -736,7 +724,7 @@ const PROJECTS = [
     title:"RHB Hospitality",
     tags:["UI/UX","Design Systems","Figma","Scripting"],
     gen:`<img src="/projects/rhb/corporate-stays-cover.jpg" alt="RHB Corporate Stays redesign — Figma export" width="1400" height="1050" />`,
-    lede:`A complete, ground-up website redesign for <b>RHB Hospitality</b> — a Saudi serviced-apartment brand across Riyadh and Al Madina — spanning one parent platform and three distinct sub-brands, each with its own visual language, unified in a single Figma component library across three breakpoints.`,
+    lede:`A complete, ground-up website redesign for <b>RHB Hospitality</b> — a Saudi serviced-apartment brand across Riyadh and Al Madina — spanning the parent platform and the <b>Bab Alsalam</b> sub-brand, each with its own visual language, unified in a single Figma component library across three breakpoints.`,
     meta:[
       {k:"Role",v:"Senior Freelance UI/UX Designer + Design Architect"},
       {k:"Format",v:"Figma design files · Dev Mode handoff · written specs"},
@@ -745,45 +733,34 @@ const PROJECTS = [
     ],
     body:`
       <h3><span class="hn">01</span>Figma screens</h3>
-      <p>Exported redesign frames from the RHB Website file — full-page Desktop 1440. Scroll inside each frame to review the complete layout.</p>
+      <p>Exported redesign frames from the RHB Website file — full-page Desktop 1440.</p>
       <div class="shot-grid">
-        <figure class="shot shot--scroll">
-          <div class="shot-scroll" data-lenis-prevent>
-            <img src="/projects/rhb/homepage.jpg" alt="RHB Homepage redesign Desktop 1440" loading="lazy"/>
-          </div>
+        <figure class="shot shot--full">
+          <img src="/projects/rhb/homepage.jpg" alt="RHB Homepage redesign Desktop 1440" loading="lazy"/>
           <figcaption>Homepage · Desktop 1440</figcaption>
         </figure>
-        <figure class="shot shot--scroll">
-          <div class="shot-scroll" data-lenis-prevent>
-            <img src="/projects/rhb/corporate-stays.jpg" alt="Corporate Stays redesign Desktop 1440" loading="lazy"/>
-          </div>
+        <figure class="shot shot--full">
+          <img src="/projects/rhb/corporate-stays.jpg" alt="Corporate Stays redesign Desktop 1440" loading="lazy"/>
           <figcaption>Corporate Stays · Desktop 1440</figcaption>
         </figure>
-        <figure class="shot shot--scroll">
-          <div class="shot-scroll" data-lenis-prevent>
-            <img src="/projects/rhb/grow-with-rhb.jpg" alt="Grow With RHB redesign Desktop 1440" loading="lazy"/>
-          </div>
+        <figure class="shot shot--full">
+          <img src="/projects/rhb/grow-with-rhb.jpg" alt="Grow With RHB redesign Desktop 1440" loading="lazy"/>
           <figcaption>Grow With RHB · Desktop 1440</figcaption>
         </figure>
-        <figure class="shot shot--scroll">
-          <div class="shot-scroll" data-lenis-prevent>
-            <img src="/projects/rhb/bab-alsalam.jpg" alt="Bab Alsalam landing redesign Desktop 1440" loading="lazy"/>
-          </div>
+        <figure class="shot shot--full">
+          <img src="/projects/rhb/bab-alsalam.jpg" alt="Bab Alsalam landing redesign Desktop 1440" loading="lazy"/>
           <figcaption>Bab Alsalam · Desktop 1440</figcaption>
         </figure>
       </div>
 
       <h3><span class="hn">02</span>The problem</h3>
-      <p>One parent brand, three completely distinct sub-brands, one platform. <b>Bab Alsalam</b> is a heritage/spiritual brand for pilgrims in Al Madina; <b>Bahi</b> is lifestyle in Riyadh; <b>Musafer</b> is wellness. Each needed its own typeface system, palette, and tone of voice — while sharing a single component library and navigation. The job was to make three identities coexist on one platform without any of them feeling like a template.</p>
+      <p>One parent brand and a distinct sub-brand on one platform. <b>Bab Alsalam</b> is a heritage/spiritual brand for pilgrims in Al Madina — with its own typeface system, palette, and tone of voice — while sharing a single component library and navigation with RHB. The job was to let both identities coexist without either feeling like a template.</p>
 
       <h3><span class="hn">03</span>The brand system</h3>
-      <p>A parent design language plus three sub-brand identities, coordinated through one shared Figma Core Library (Nav, Footer, Cards, Accordion, Buttons). Each sub-brand carries its own accent, drawn from its world:</p>
+      <p>A parent design language plus the Bab Alsalam identity, coordinated through one shared Figma Core Library (Nav, Footer, Cards, Accordion, Buttons). Accents drawn from each brand’s world:</p>
       <div class="swatches">
         <span class="sw"><i style="background:#a91f23"></i><span class="n">RHB Red</span></span>
         <span class="sw"><i style="background:#627057"></i><span class="n">Bab Alsalam · Rawdah Green</span></span>
-        <span class="sw"><i style="background:#9c95f4"></i><span class="n">Bahi · Purple</span></span>
-        <span class="sw"><i style="background:#f4ffc5"></i><span class="n">Bahi · Yellow-Green</span></span>
-        <span class="sw"><i style="background:#E8DFD0"></i><span class="n">Musafer · Warm Sand</span></span>
       </div>
       <p>Type is split by role: <b>Catavalo</b> for the first heading on a page, <b>Degular Display</b> for everything else — one characterful voice, used with restraint, over a clean workhorse body.</p>
 
@@ -801,27 +778,19 @@ const PROJECTS = [
         <li><b>Corporate Stays</b> — 13 sections; unit types, dark editorial branch index, per-property detail, comparison grid, inquiry form. No prices, per client requirement.</li>
         <li><b>Grow With RHB</b> — investment/partnership page with a staircase-indent pillar layout escaping auto-layout flow.</li>
         <li><b>Bab Alsalam</b> — heritage landing with brand-pillar hairline dividers and Ziyarah landmark write-ups.</li>
-        <li><b>Neighbourhood Heroes, Utility Pages, Bahi Landing</b> — all shipped across three breakpoints.</li>
+        <li><b>Neighbourhood Heroes &amp; Utility Pages</b> — shipped across three breakpoints.</li>
       </ul>
 
-      <h3><span class="hn">06</span>Engineering rigor — bugs fixed</h3>
-      <p>Systemic issues found and resolved during the engagement, each turned into a rule going forward:</p>
-      <ul class="cs__list">
-        <li><b>White fill behind text</b> — new auto-layout frames inherit solid white; swept and set to transparent, with an explicit-fill rule on creation.</li>
-        <li><b>Submit button hidden under footer</b> — the inquiry form was let to self-size, then the footer positioned from its real computed height.</li>
-        <li><b>Stat-box alignment</b> — right-anchoring only works when a box hugs its own content, not when it stretches full-width; fixed across the key-figures grid.</li>
-      </ul>
-
-      <h3><span class="hn">07</span>The visual thesis</h3>
+      <h3><span class="hn">06</span>The visual thesis</h3>
       <p>The site's visual language was deliberately reverse-engineered from the negative-space aesthetic of a physical print brand binder — then quantified by measuring the actual pages (<b>~74% negative space</b> on quote pages) and translated into Figma spacing conventions.</p>
       <div class="callout">
         <div class="q">"RHB fills the whitespace with design-led homes made for functional, intentional living."</div>
         <div class="a">Brand philosophy — quote-break section</div>
       </div>
 
-      <h3><span class="hn">08</span>By the numbers</h3>
+      <h3><span class="hn">07</span>By the numbers</h3>
       <div class="metrics">
-        <div class="metric"><span class="fig">1</span><span class="lab">Parent + 3 sub-brands</span></div>
+        <div class="metric"><span class="fig">1</span><span class="lab">Parent + Bab Alsalam</span></div>
         <div class="metric"><span class="fig">7</span><span class="lab">Pages shipped</span></div>
         <div class="metric"><span class="fig">3</span><span class="lab">Breakpoints</span></div>
         <div class="metric"><span class="fig">80</span><span class="lab">Footers swept</span></div>
@@ -1098,12 +1067,14 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 
   function lockScroll(){
     lockY=window.scrollY||0;
+    document.documentElement.classList.add("modal-open");
     document.body.classList.add("no-scroll");
     document.body.style.top=`-${lockY}px`;
     document.body.style.position="fixed";
     document.body.style.width="100%";
   }
   function unlockScroll(){
+    document.documentElement.classList.remove("modal-open");
     document.body.classList.remove("no-scroll");
     document.body.style.position="";
     document.body.style.top="";
