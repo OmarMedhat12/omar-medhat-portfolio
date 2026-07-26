@@ -1226,7 +1226,7 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 })();
 
 /* ============================================================
-   CONTACT FORM — sends to your Gmail via FormSubmit
+   CONTACT FORM — posts to /api/contact → your Gmail (Web3Forms)
    ============================================================ */
 (function(){
   const form=document.getElementById("form");
@@ -1249,31 +1249,32 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
     Object.values(fields).forEach(f=>{if(!check(f))valid=false;});
     if(!valid){form.querySelector(".invalid input,.invalid textarea")?.focus();return;}
 
-    const prevLabel=submitBtn.textContent;
+    const prevLabel=submitBtn.innerHTML;
     submitBtn.disabled=true;
     submitBtn.textContent="Sending…";
 
     try{
-      const res=await fetch("https://formsubmit.co/ajax/omarmedhat0812@gmail.com",{
+      const res=await fetch("/api/contact",{
         method:"POST",
         headers:{"Content-Type":"application/json","Accept":"application/json"},
         body:JSON.stringify({
           name:fields.name.el.value.trim(),
           email:fields.email.el.value.trim(),
-          message:fields.message.el.value.trim(),
-          _subject:"Portfolio contact — Omar Medhat",
-          _template:"table",
-          _captcha:"false"
+          message:fields.message.el.value.trim()
         })
       });
-      if(!res.ok) throw new Error("send failed");
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok||!data.ok) throw new Error(data.error||"send failed");
       form.classList.add("is-sent");
       submitBtn.textContent="Sent ✓";
       form.reset();
     }catch(err){
       submitBtn.disabled=false;
-      submitBtn.textContent=prevLabel;
-      alert("Couldn't send right now. Email me directly at omarmedhat0812@gmail.com");
+      submitBtn.innerHTML=prevLabel;
+      const msg=(err&&err.message)||"";
+      alert(msg.includes("WEB3FORMS")||msg.includes("not configured")
+        ? "Form email isn’t set up yet on the server. Use Email / LinkedIn meanwhile."
+        : "Couldn't send right now. Email me directly at omarmedhat0812@gmail.com");
     }
   });
 })();
