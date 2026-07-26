@@ -76,7 +76,9 @@ body.no-scroll{
   overflow:hidden;
 }
 html.modal-open,
-html.modal-open body{
+html.modal-open body,
+html.menu-open,
+html.menu-open body{
   overflow:hidden;
   overscroll-behavior:none;
 }
@@ -165,7 +167,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
    NAV
    ============================================================ */
 .nav{
-  position:fixed;top:0;left:0;right:0;z-index:900;
+  position:fixed;top:0;left:0;right:0;z-index:1002;
   display:flex;align-items:center;justify-content:space-between;
   padding:1.4rem var(--pad);
   transition:background .4s var(--ease),padding .4s var(--ease),border-color .4s var(--ease);
@@ -175,9 +177,17 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   background:rgba(14,13,12,.72);backdrop-filter:blur(14px);
   padding-block:1rem;border-bottom-color:var(--line-2);
 }
+/* backdrop-filter creates a containing block — kill it while the menu is open */
+.nav.is-open,
+.nav.is-open.is-solid{
+  background:transparent;
+  backdrop-filter:none;
+  border-bottom-color:transparent;
+}
 .nav__brand{
   font-family:var(--ff-display);font-weight:600;font-size:1.05rem;letter-spacing:-.01em;
   display:flex;align-items:center;gap:.55rem;
+  position:relative;z-index:1003;
 }
 .nav__brand .brand-dot{width:7px;height:7px;border-radius:50%;background:var(--rhb)}
 .nav__links{display:flex;align-items:center;gap:2.2rem}
@@ -192,7 +202,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .nav__links a:hover{color:var(--text)}
 .nav__links a:hover::after{width:100%}
 
-.nav__burger{display:none;width:34px;height:20px;position:relative;z-index:901}
+.nav__burger{display:none;width:34px;height:20px;position:relative;z-index:1003}
 .nav__burger span{
   position:absolute;left:0;height:2px;width:100%;background:var(--text);
   transition:transform .4s var(--ease),opacity .3s var(--ease),top .4s var(--ease);
@@ -205,13 +215,14 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .nav.is-open .nav__burger span:nth-child(3){top:9px;transform:rotate(-45deg)}
 
 .nav__panel{
-  position:fixed;inset:0;z-index:895;background:var(--bg);
+  position:fixed;inset:0;z-index:1001;
+  background:var(--bg);
   display:flex;flex-direction:column;justify-content:center;gap:1.2rem;
   padding:var(--pad);
   opacity:0;visibility:hidden;pointer-events:none;
   transition:opacity .35s var(--ease),visibility .35s var(--ease);
 }
-.nav.is-open .nav__panel{
+.nav__panel.is-open{
   opacity:1;visibility:visible;pointer-events:auto;
 }
 .nav__panel a{
@@ -219,12 +230,12 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   letter-spacing:-.02em;color:var(--text);
   opacity:0;transform:translateY(16px);
 }
-.nav.is-open .nav__panel a{
+.nav__panel.is-open a{
   animation:panelIn .45s var(--ease) forwards;
 }
-.nav.is-open .nav__panel a:nth-child(1){animation-delay:.08s}
-.nav.is-open .nav__panel a:nth-child(2){animation-delay:.14s}
-.nav.is-open .nav__panel a:nth-child(3){animation-delay:.2s}
+.nav__panel.is-open a:nth-child(1){animation-delay:.08s}
+.nav__panel.is-open a:nth-child(2){animation-delay:.14s}
+.nav__panel.is-open a:nth-child(3){animation-delay:.2s}
 @keyframes panelIn{to{opacity:1;transform:translateY(0)}}
 
 /* ============================================================
@@ -553,12 +564,12 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   <button class="nav__burger" id="burger" aria-label="Open menu" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
-  <div class="nav__panel" id="navPanel">
-    <a href="#work" data-nav>Work</a>
-    <a href="#about" data-nav>About</a>
-    <a href="#contact" data-nav>Contact</a>
-  </div>
 </header>
+<div class="nav__panel" id="navPanel" aria-hidden="true">
+  <a href="#work" data-nav>Work</a>
+  <a href="#about" data-nav>About</a>
+  <a href="#contact" data-nav>Contact</a>
+</div>
 
 <main id="top">
 
@@ -1034,23 +1045,43 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   const nav=document.getElementById("nav");
   const burger=document.getElementById("burger");
   const panel=document.getElementById("navPanel");
-  let ticking=false;
+  let ticking=false,lockY=0;
   addEventListener("scroll",()=>{
     if(ticking) return;
     ticking=true;
     requestAnimationFrame(()=>{
-      nav.classList.toggle("is-solid",scrollY>40);
+      if(!nav.classList.contains("is-open")) nav.classList.toggle("is-solid",scrollY>40);
       ticking=false;
     });
   },{passive:true});
   function toggle(open){
     nav.classList.toggle("is-open",open);
+    panel.classList.toggle("is-open",open);
+    panel.setAttribute("aria-hidden",open?"false":"true");
     burger.setAttribute("aria-expanded",open);
     burger.setAttribute("aria-label",open?"Close menu":"Open menu");
-    document.body.classList.toggle("no-scroll",open);
+    if(open){
+      lockY=window.scrollY||0;
+      document.documentElement.classList.add("menu-open");
+      document.body.classList.add("no-scroll");
+      document.body.style.top=`-${lockY}px`;
+      document.body.style.position="fixed";
+      document.body.style.width="100%";
+    }else{
+      document.documentElement.classList.remove("menu-open");
+      document.body.classList.remove("no-scroll");
+      document.body.style.position="";
+      document.body.style.top="";
+      document.body.style.width="";
+      window.scrollTo(0,lockY);
+      nav.classList.toggle("is-solid",window.scrollY>40);
+    }
   }
   burger.addEventListener("click",()=>toggle(!nav.classList.contains("is-open")));
   panel.querySelectorAll("[data-nav]").forEach(a=>a.addEventListener("click",()=>toggle(false)));
+  addEventListener("keydown",e=>{
+    if(e.key==="Escape"&&nav.classList.contains("is-open")) toggle(false);
+  });
 })();
 
 /* ============================================================
