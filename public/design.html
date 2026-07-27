@@ -68,16 +68,17 @@ body{
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
   overflow-x:hidden;
-  overscroll-behavior-y:none;
 }
-body.no-scroll{
-  overflow:hidden;
-}
+body.no-scroll{overflow:hidden}
 html.modal-open,
+html.menu-open{
+  overflow:hidden;
+  height:100%;
+}
 html.modal-open body,
-html.menu-open,
 html.menu-open body{
   overflow:hidden;
+  height:100%;
   overscroll-behavior:none;
 }
 
@@ -296,9 +297,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .section__num{font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.2em;color:var(--faint)}
 
-/* reveal */
-[data-reveal]{opacity:0;transform:translateY(20px);transition:opacity .55s var(--ease),transform .55s var(--ease);transition-delay:calc(var(--i,0)*50ms)}
-[data-reveal].in{opacity:1;transform:none}
+/* reveal — opacity only; transforms during scroll cause jank */
+[data-reveal]{opacity:0;transition:opacity .5s var(--ease);transition-delay:calc(var(--i,0)*40ms)}
+[data-reveal].in{opacity:1}
 
 /* ============================================================
    WORK / PROJECT CARDS
@@ -409,10 +410,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .lab-card{
   border:1px solid var(--line);border-radius:8px;background:var(--panel);
   padding:1.4rem;display:flex;flex-direction:column;gap:1rem;min-height:100%;
-  transition:border-color .35s var(--ease),transform .35s var(--ease);
 }
-.lab-card[data-project]{cursor:pointer}
-.lab-card[data-project]:hover{border-color:rgba(111,174,192,.35);transform:translateY(-3px)}
+.lab-card--jump{cursor:pointer;transition:border-color .35s var(--ease)}
+.lab-card--jump:hover{border-color:rgba(111,174,192,.35)}
+.lab-card--static{opacity:.92}
 .lab-card__type{font-family:var(--ff-mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .lab-card__title{font-family:var(--ff-display);font-weight:500;font-size:1.35rem;letter-spacing:-.02em;line-height:1.1}
 .lab-card__desc{color:var(--muted);font-size:.92rem;line-height:1.55;flex:1}
@@ -423,9 +424,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .lab-card__link{
   font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--lab);
-  display:inline-flex;align-items:center;gap:.45rem;
+  display:inline-flex;align-items:center;gap:.45rem;margin-top:auto;
 }
-.lab-card[data-project] .lab-card__link{color:var(--ds)}
+.lab-card--jump .lab-card__link{color:var(--ds)}
 
 /* ============================================================
    ABOUT
@@ -474,8 +475,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .modal.is-open{visibility:visible}
 .modal__scrim{
-  position:absolute;inset:0;background:rgba(6,5,5,.72);backdrop-filter:blur(3px);
-  opacity:0;transition:opacity .4s var(--ease);
+  position:absolute;inset:0;background:rgba(6,5,5,.85);
+  opacity:0;transition:opacity .3s var(--ease);
 }
 .modal.is-open .modal__scrim{opacity:1}
 .modal__sheet{
@@ -483,21 +484,22 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   background:var(--bg-2);border-left:1px solid var(--line);
   overflow-y:auto;overflow-x:hidden;
   overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;
   touch-action:pan-y;
-  transform:translateX(100%);transition:transform .55s var(--ease);
-  will-change:transform;
+  -webkit-overflow-scrolling:auto;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s var(--ease);
 }
-.modal.is-open .modal__sheet{transform:translateX(0);will-change:auto}
-.modal__sheet::-webkit-scrollbar{width:10px}
-.modal__sheet::-webkit-scrollbar-thumb{background:var(--panel-2);border-radius:10px}
+.modal.is-open .modal__sheet{opacity:1;pointer-events:auto}
+.modal__sheet::-webkit-scrollbar{width:8px}
+.modal__sheet::-webkit-scrollbar-thumb{background:var(--panel-2);border-radius:8px}
 
 .modal__bar{
   position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;
   gap:1rem;padding:1.1rem clamp(1.4rem,4vw,3rem);
-  background:rgba(20,17,16,.92);
+  background:var(--bg-2);
   border-bottom:1px solid var(--line);
 }
+.cs [id]{scroll-margin-top:5rem}
 .modal__bar .t{display:flex;flex-direction:column;gap:.15rem;min-width:0}
 .modal__bar .t .k{font-family:var(--ff-mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mb-accent,var(--accent))}
 .modal__bar .t .n{font-family:var(--ff-display);font-weight:500;font-size:1.15rem;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -592,11 +594,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   }
   .modal__sheet{width:100%;border-left:none}
 }
-@media (max-width:900px){
-  /* mobile modal = full-screen slide-up */
-  .modal__sheet{top:auto;bottom:0;height:100%;transform:translateY(100%)}
-  .modal.is-open .modal__sheet{transform:translateY(0)}
-}
 @media (max-width:560px){
   .hero__index{gap:1.4rem 2rem}
   .cs__hero{aspect-ratio:4/3}
@@ -673,7 +670,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       <h2 class="section__title">One build, engineered end&#8209;to&#8209;end.</h2>
     </div>
 
-    <article class="featured" data-project="ds" data-accent="ds" style="--card-accent:var(--ds)" data-reveal data-cursor-card>
+    <article class="featured" data-project="ds" data-accent="ds" style="--card-accent:var(--ds)" data-reveal data-cursor-card tabindex="0" role="button" aria-label="Open Dar Senosi case study">
       <div class="featured__media">
         <img src="/projects/dar-senosi/homepage.jpg" alt="Dar Senosi live homepage — antique doors and vintage Mercedes hero" width="1600" height="900" />
         <span class="featured__live"><i></i>Live at darsenosi.com</span>
@@ -685,7 +682,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         <div class="featured__tags">
           <span class="tag">Shopify</span><span class="tag">Liquid</span><span class="tag">Dual-commerce</span><span class="tag">Design + build</span>
         </div>
-        <span class="featured__cta">Read the full case study
+        <span class="featured__cta">Open case study
           <svg width="20" height="10" viewBox="0 0 20 10" fill="none"><path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" stroke-width="1.4"/></svg>
         </span>
       </div>
@@ -705,29 +702,29 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   <div class="wrap">
     <div class="section__head" data-reveal>
       <span class="section__num">02 — Lab</span>
-      <h2 class="section__title">Proof beyond the headline project.</h2>
+      <h2 class="section__title">Highlights from the case study.</h2>
     </div>
     <div class="lab-grid">
-      <article class="lab-card" data-reveal>
+      <article class="lab-card lab-card--static" data-reveal>
         <span class="lab-card__type">Self-initiated</span>
         <h3 class="lab-card__title">This portfolio</h3>
-        <p class="lab-card__desc">Designed and built from scratch — custom typography, modal case studies, scroll choreography, bilingual canvas, and a mobile nav that actually works. The site is the artifact.</p>
+        <p class="lab-card__desc">Designed and built from scratch — custom typography, modal case studies, bilingual canvas, and a mobile nav that actually works. The site is the artifact.</p>
         <div class="lab-card__tags"><span>HTML/CSS/JS</span><span>Next.js</span><span>Motion</span></div>
         <span class="lab-card__link">You&rsquo;re viewing it</span>
       </article>
-      <article class="lab-card" data-project="ds" data-cursor-card data-reveal>
+      <article class="lab-card lab-card--jump" data-project="ds" data-section="cs-commerce" data-reveal role="button" tabindex="0" aria-label="Open Dar Senosi case study — commerce chapter">
         <span class="lab-card__type">Dar Senosi &middot; Commerce</span>
         <h3 class="lab-card__title">Dual-commerce system</h3>
         <p class="lab-card__desc">Metafield-driven CTA swap on every product page — sold archive, reservation via WhatsApp, or standard checkout. Declarative JSON contract, zero custom app.</p>
         <div class="lab-card__tags"><span>Shopify</span><span>Metafields</span><span>JS</span></div>
-        <span class="lab-card__link">View in case study →</span>
+        <span class="lab-card__link">Commerce chapter →</span>
       </article>
-      <article class="lab-card" data-project="ds" data-cursor-card data-reveal>
+      <article class="lab-card lab-card--jump" data-project="ds" data-section="cs-design" data-reveal role="button" tabindex="0" aria-label="Open Dar Senosi case study — design chapter">
         <span class="lab-card__type">Dar Senosi &middot; Design</span>
         <h3 class="lab-card__title">Editorial design system</h3>
         <p class="lab-card__desc">Warm antique-catalogue aesthetic — self-hosted type across four families, IBM Plex Arabic for RTL labels, and a token layer a client can maintain from the Theme Customizer.</p>
         <div class="lab-card__tags"><span>CSS tokens</span><span>Typography</span><span>Arabic</span></div>
-        <span class="lab-card__link">View in case study →</span>
+        <span class="lab-card__link">Design chapter →</span>
       </article>
     </div>
   </div>
@@ -846,7 +843,7 @@ const PROJECTS = [
       <h3><span class="hn">02</span>The brief</h3>
       <p>The brand needed to feel like a luxury editorial destination — closer to a gallery or design magazine than a typical e-commerce shop. Explicitly: <b>no generic Shopify template aesthetics</b>, a warm dark editorial palette, and Arabic-inflected typography. A full SPA mockup was produced before a single line of Shopify code, and treated as the single source of visual truth.</p>
 
-      <h3><span class="hn">03</span>The design system</h3>
+      <h3 id="cs-design"><span class="hn">03</span>The design system</h3>
       <p>A bespoke CSS design system (3,000+ lines) layered over Atelier's base — warm, textural, and material, built to look like an antique catalogue rather than a startup.</p>
       <div class="swatches">
         <span class="sw"><i style="background:#fdfaf2"></i><span class="n">Paper</span></span>
@@ -858,7 +855,7 @@ const PROJECTS = [
       </div>
       <p>Type roles: <b>Chamberi Display</b> for headings, <b>Breton</b> for body, <b>Symphony Pro</b> for calligraphic accents, and <b>IBM Plex Sans Arabic</b> for Arabic labels — all self-hosted via <span class="mono">@font-face</span> off Shopify's CDN, zero external font calls.</p>
 
-      <h3><span class="hn">04</span>Dual-commerce — the headline feature</h3>
+      <h3 id="cs-commerce"><span class="hn">04</span>Dual-commerce — the headline feature</h3>
       <p>Shopify has one checkout flow. Dar Senosi needed three, without a custom app budget. The solution: a <b>metafield-driven CTA-swap system</b>. Two metafields per product drive a decision tree that runs on every product page:</p>
       <div class="cs__grid">
         <div class="cs__cell"><div class="lab">Sold</div><div class="val">"Sold — Archive" badge, no CTA — kept visible for discovery</div></div>
@@ -946,11 +943,11 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   },{passive:true});
   document.addEventListener("mouseover",e=>{
     if(e.target.closest("[data-cursor='link'],a,button,[role='button']")) dot.classList.add("is-hover");
-    if(e.target.closest("[data-cursor-card],[data-project]")) label.classList.add("is-on");
+    if(e.target.closest("[data-cursor-card]")) label.classList.add("is-on");
   });
   document.addEventListener("mouseout",e=>{
     if(e.target.closest("[data-cursor='link'],a,button,[role='button']")) dot.classList.remove("is-hover");
-    if(e.target.closest("[data-cursor-card],[data-project]")) label.classList.remove("is-on");
+    if(e.target.closest("[data-cursor-card]")) label.classList.remove("is-on");
   });
   document.addEventListener("mouseleave",()=>dot.classList.add("is-hidden"));
   document.addEventListener("mouseenter",()=>dot.classList.remove("is-hidden"));
@@ -986,7 +983,7 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   }
   function draw(){
     raf=0;
-    if(!visible||document.hidden) return;
+    if(!visible||document.hidden||document.documentElement.classList.contains("modal-open")||document.documentElement.classList.contains("menu-open")) return;
     ctx.clearRect(0,0,w,h);
     for(const g of glyphs){
       g.y-=g.vy;g.x+=g.dir*.04;
@@ -1051,7 +1048,7 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   const nav=document.getElementById("nav");
   const burger=document.getElementById("burger");
   const panel=document.getElementById("navPanel");
-  let ticking=false,lockY=0;
+  let ticking=false;
   addEventListener("scroll",()=>{
     if(ticking) return;
     ticking=true;
@@ -1066,22 +1063,8 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
     panel.setAttribute("aria-hidden",open?"false":"true");
     burger.setAttribute("aria-expanded",open);
     burger.setAttribute("aria-label",open?"Close menu":"Open menu");
-    if(open){
-      lockY=window.scrollY||0;
-      document.documentElement.classList.add("menu-open");
-      document.body.classList.add("no-scroll");
-      document.body.style.top=`-${lockY}px`;
-      document.body.style.position="fixed";
-      document.body.style.width="100%";
-    }else{
-      document.documentElement.classList.remove("menu-open");
-      document.body.classList.remove("no-scroll");
-      document.body.style.position="";
-      document.body.style.top="";
-      document.body.style.width="";
-      window.scrollTo(0,lockY);
-      nav.classList.toggle("is-solid",window.scrollY>40);
-    }
+    document.documentElement.classList.toggle("menu-open",open);
+    document.body.classList.toggle("no-scroll",open);
   }
   burger.addEventListener("click",()=>toggle(!nav.classList.contains("is-open")));
   panel.querySelectorAll("[data-nav]").forEach(a=>a.addEventListener("click",()=>toggle(false)));
@@ -1100,23 +1083,21 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   const titleEl=document.getElementById("modalTitle");
   const kickerEl=document.getElementById("modalKicker");
   const closeBtn=document.getElementById("modalClose");
-  let current=0,lastFocus=null,lockY=0;
+  let current=0,lastFocus=null;
 
   function lockScroll(){
-    lockY=window.scrollY||0;
     document.documentElement.classList.add("modal-open");
     document.body.classList.add("no-scroll");
-    document.body.style.top=`-${lockY}px`;
-    document.body.style.position="fixed";
-    document.body.style.width="100%";
   }
   function unlockScroll(){
     document.documentElement.classList.remove("modal-open");
     document.body.classList.remove("no-scroll");
-    document.body.style.position="";
-    document.body.style.top="";
-    document.body.style.width="";
-    window.scrollTo(0,lockY);
+  }
+
+  function scrollToSection(id){
+    if(!id) return;
+    const target=sheet.querySelector(`#${CSS.escape(id)}`);
+    if(target) target.scrollIntoView({behavior:"auto",block:"start"});
   }
 
   function render(i){
@@ -1143,16 +1124,19 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
         </div>`:""}
       </div>`;
     content.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{render(+b.dataset.go);sheet.scrollTop=0;}));
-    sheet.scrollTop=0;
   }
 
-  function open(i){
+  function open(i,sectionId){
     lastFocus=document.activeElement;
     render(i);
+    sheet.scrollTop=0;
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden","false");
     lockScroll();
-    setTimeout(()=>closeBtn.focus(),80);
+    requestAnimationFrame(()=>{
+      scrollToSection(sectionId);
+      setTimeout(()=>closeBtn.focus(),60);
+    });
   }
   function close(){
     modal.classList.remove("is-open");
@@ -1161,16 +1145,23 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
     if(lastFocus) lastFocus.focus();
   }
 
+  sheet.addEventListener("wheel",e=>e.stopPropagation(),{passive:true});
+  sheet.addEventListener("touchmove",e=>e.stopPropagation(),{passive:true});
+  document.addEventListener("wheel",e=>{
+    if(modal.classList.contains("is-open")&&!sheet.contains(e.target)) e.preventDefault();
+  },{passive:false});
+
   document.querySelectorAll("[data-project]").forEach(el=>{
     const idx=PROJECTS.findIndex(p=>p.id===el.dataset.project);
     if(idx<0) return;
-    el.addEventListener("click",()=>open(idx));
-    if(el.matches(".featured,.lab-card")){
-      el.setAttribute("tabindex","0");
-      el.setAttribute("role","button");
-      const title=el.querySelector(".featured__title,.lab-card__title");
-      el.setAttribute("aria-label",`Open ${title?title.textContent.trim():"Dar Senosi"} case study`);
-      el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open(idx);}});
+    const section=el.dataset.section||"";
+    const activate=()=>open(idx,section);
+    el.addEventListener("click",e=>{
+      if(e.target.closest("a[href^='http']")) return;
+      activate();
+    });
+    if(el.matches(".featured,.lab-card--jump")){
+      el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();activate();}});
     }
   });
 
