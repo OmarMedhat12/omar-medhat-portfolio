@@ -235,6 +235,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .nav__panel.is-open a:nth-child(1){animation-delay:.08s}
 .nav__panel.is-open a:nth-child(2){animation-delay:.14s}
 .nav__panel.is-open a:nth-child(3){animation-delay:.2s}
+.nav__panel.is-open a:nth-child(4){animation-delay:.26s}
 @keyframes panelIn{to{opacity:1;transform:translateY(0)}}
 
 /* ============================================================
@@ -403,30 +404,30 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .proof a.fig-link:hover{opacity:.85}
 
 /* ============================================================
-   LAB
+   CRAFT
    ============================================================ */
-.section--lab{padding-top:clamp(3rem,7vw,5rem)}
-.lab-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1rem,2.5vw,1.4rem)}
-.lab-card{
+.section--craft{padding-top:clamp(3rem,7vw,5rem)}
+.craft-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1rem,2.5vw,1.4rem)}
+.craft-card{
   border:1px solid var(--line);border-radius:8px;background:var(--panel);
   padding:1.4rem;display:flex;flex-direction:column;gap:1rem;min-height:100%;
 }
-.lab-card--jump{cursor:pointer;transition:border-color .35s var(--ease)}
-.lab-card--jump:hover{border-color:rgba(111,174,192,.35)}
-.lab-card--static{opacity:.92}
-.lab-card__type{font-family:var(--ff-mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
-.lab-card__title{font-family:var(--ff-display);font-weight:500;font-size:1.35rem;letter-spacing:-.02em;line-height:1.1}
-.lab-card__desc{color:var(--muted);font-size:.92rem;line-height:1.55;flex:1}
-.lab-card__tags{display:flex;flex-wrap:wrap;gap:.45rem}
-.lab-card__tags span{
+.craft-card--jump{cursor:pointer;transition:border-color .35s var(--ease)}
+.craft-card--jump:hover{border-color:rgba(111,174,192,.35)}
+.craft-card--static{opacity:.92}
+.craft-card__type{font-family:var(--ff-mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.craft-card__title{font-family:var(--ff-display);font-weight:500;font-size:1.35rem;letter-spacing:-.02em;line-height:1.1}
+.craft-card__desc{color:var(--muted);font-size:.92rem;line-height:1.55;flex:1}
+.craft-card__tags{display:flex;flex-wrap:wrap;gap:.45rem}
+.craft-card__tags span{
   font-family:var(--ff-mono);font-size:.62rem;letter-spacing:.06em;color:var(--muted);
   padding:.35em .65em;border:1px solid var(--line);border-radius:100px;
 }
-.lab-card__link{
+.craft-card__link{
   font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--lab);
   display:inline-flex;align-items:center;gap:.45rem;margin-top:auto;
 }
-.lab-card--jump .lab-card__link{color:var(--ds)}
+.craft-card--jump .craft-card__link{color:var(--ds)}
 
 /* ============================================================
    ABOUT
@@ -578,7 +579,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .nav__burger{display:block}
   .featured{grid-template-columns:1fr}
   .proof-strip{grid-template-columns:1fr 1fr}
-  .lab-grid{grid-template-columns:1fr}
+  .craft-grid{grid-template-columns:1fr}
   .about{grid-template-columns:1fr}
   .about__side{
     position:static !important;
@@ -626,6 +627,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   <a href="#top" class="nav__brand" data-cursor="link"><span class="brand-dot"></span>Omar</a>
   <nav class="nav__links" aria-label="Primary">
     <a href="#work" data-cursor="link">Work</a>
+    <a href="#craft" data-cursor="link">Craft</a>
     <a href="#about" data-cursor="link">About</a>
     <a href="#contact" data-cursor="link">Contact</a>
   </nav>
@@ -635,6 +637,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 </header>
 <div class="nav__panel" id="navPanel" aria-hidden="true">
   <a href="#work" data-nav>Work</a>
+  <a href="#craft" data-nav>Craft</a>
   <a href="#about" data-nav>About</a>
   <a href="#contact" data-nav>Contact</a>
 </div>
@@ -697,34 +700,34 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   </div>
 </section>
 
-<!-- ===================== LAB ===================== -->
-<section class="section section--lab" id="lab">
+<!-- ===================== CRAFT ===================== -->
+<section class="section section--craft" id="craft">
   <div class="wrap">
     <div class="section__head" data-reveal>
-      <span class="section__num">02 — Lab</span>
-      <h2 class="section__title">Highlights from the case study.</h2>
+      <span class="section__num">02 — Craft</span>
+      <h2 class="section__title">Depth behind the headline project.</h2>
     </div>
-    <div class="lab-grid">
-      <article class="lab-card lab-card--static" data-reveal>
-        <span class="lab-card__type">Self-initiated</span>
-        <h3 class="lab-card__title">This portfolio</h3>
-        <p class="lab-card__desc">Designed and built from scratch — custom typography, modal case studies, bilingual canvas, and a mobile nav that actually works. The site is the artifact.</p>
-        <div class="lab-card__tags"><span>HTML/CSS/JS</span><span>Next.js</span><span>Motion</span></div>
-        <span class="lab-card__link">You&rsquo;re viewing it</span>
+    <div class="craft-grid">
+      <article class="craft-card craft-card--static" data-reveal>
+        <span class="craft-card__type">Self-initiated</span>
+        <h3 class="craft-card__title">This portfolio</h3>
+        <p class="craft-card__desc">Designed and built from scratch — custom typography, modal case studies, bilingual canvas, and a mobile nav that actually works. The site is the artifact.</p>
+        <div class="craft-card__tags"><span>HTML/CSS/JS</span><span>Next.js</span><span>Motion</span></div>
+        <span class="craft-card__link">You&rsquo;re viewing it</span>
       </article>
-      <article class="lab-card lab-card--jump" data-project="ds" data-section="cs-commerce" data-reveal role="button" tabindex="0" aria-label="Open Dar Senosi case study — commerce chapter">
-        <span class="lab-card__type">Dar Senosi &middot; Commerce</span>
-        <h3 class="lab-card__title">Dual-commerce system</h3>
-        <p class="lab-card__desc">Metafield-driven CTA swap on every product page — sold archive, reservation via WhatsApp, or standard checkout. Declarative JSON contract, zero custom app.</p>
-        <div class="lab-card__tags"><span>Shopify</span><span>Metafields</span><span>JS</span></div>
-        <span class="lab-card__link">Commerce chapter →</span>
+      <article class="craft-card craft-card--jump" data-project="ds" data-section="cs-commerce" data-reveal role="button" tabindex="0" aria-label="Open Dar Senosi case study — commerce chapter">
+        <span class="craft-card__type">Dar Senosi &middot; Commerce</span>
+        <h3 class="craft-card__title">Dual-commerce system</h3>
+        <p class="craft-card__desc">Metafield-driven CTA swap on every product page — sold archive, reservation via WhatsApp, or standard checkout. Declarative JSON contract, zero custom app.</p>
+        <div class="craft-card__tags"><span>Shopify</span><span>Metafields</span><span>JS</span></div>
+        <span class="craft-card__link">Commerce chapter →</span>
       </article>
-      <article class="lab-card lab-card--jump" data-project="ds" data-section="cs-design" data-reveal role="button" tabindex="0" aria-label="Open Dar Senosi case study — design chapter">
-        <span class="lab-card__type">Dar Senosi &middot; Design</span>
-        <h3 class="lab-card__title">Editorial design system</h3>
-        <p class="lab-card__desc">Warm antique-catalogue aesthetic — self-hosted type across four families, IBM Plex Arabic for RTL labels, and a token layer a client can maintain from the Theme Customizer.</p>
-        <div class="lab-card__tags"><span>CSS tokens</span><span>Typography</span><span>Arabic</span></div>
-        <span class="lab-card__link">Design chapter →</span>
+      <article class="craft-card craft-card--jump" data-project="ds" data-section="cs-design" data-reveal role="button" tabindex="0" aria-label="Open Dar Senosi case study — design chapter">
+        <span class="craft-card__type">Dar Senosi &middot; Design</span>
+        <h3 class="craft-card__title">Editorial design system</h3>
+        <p class="craft-card__desc">Warm antique-catalogue aesthetic — self-hosted type across four families, IBM Plex Arabic for RTL labels, and a token layer a client can maintain from the Theme Customizer.</p>
+        <div class="craft-card__tags"><span>CSS tokens</span><span>Typography</span><span>Arabic</span></div>
+        <span class="craft-card__link">Design chapter →</span>
       </article>
     </div>
   </div>
@@ -1160,7 +1163,7 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
       if(e.target.closest("a[href^='http']")) return;
       activate();
     });
-    if(el.matches(".featured,.lab-card--jump")){
+    if(el.matches(".featured,.craft-card--jump")){
       el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();activate();}});
     }
   });
